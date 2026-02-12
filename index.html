@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simple Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #87ceeb;
+            background-image: url("weather.jpg");
+            overflow: hidden;
+            background-size: contain;
+            background-position: top center;
+            background-repeat: no-repeat;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            min-height: 100vh;
+            margin: 0;
+
+
+
+        }
+
+        h1 {
+            font-size: 100px;
+            margin-top: 200px;
+            /* margin-bottom: 1rem; */
+
+        }
+
+        .outline-text {
+            color: black;
+            /* text color */
+            text-shadow:
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff;
+        }
+
+
+        #weather-form {
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            padding: 0.5rem;
+            font-size: 2rem;
+            width: 400px;
+            border: 1.5px solid rgba(0, 0, 0, 0.941);
+            border-radius: 4px;
+
+        }
+
+        /* input:hover{
+    border: 1px solid black;
+  } */
+        button {
+            padding: 0.55rem 1rem;
+            font-size: 1.8rem;
+            margin-left: 0.5rem;
+            border: 1.5px solid black;
+            background-color: #0077cc;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e70606;
+        }
+
+        #result {
+            background: rgb(212, 204, 199);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: 2px;
+            border-color: #000000f0;
+            box-shadow: 0 0 10px rgba(1, 2, 3, 5.1);
+            min-width: 400px;
+            min-height: 350px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        #error {
+            color: red;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 class="outline-text" style="margin-top: 100px;">Weather App</h1>
+
+    <form id="weather-form">
+        <input type="text" id="location-input" placeholder="Enter location (e.g. London)" required />
+        <button type="submit">Get Weather</button>
+    </form>
+
+    <div id="result" style="display:none;">
+        <h2 id="location-name"></h2>
+        <p><strong>Temperature:</strong> <span id="temp-c"></span> °C</p>
+        <p><strong>Condition:</strong> <span id="condition-text"></span></p>
+        <img id="condition-icon" alt="Weather icon" />
+    </div>
+
+    <div id="error"></div>
+
+    <script>
+        const form = document.getElementById('weather-form');
+        const locationInput = document.getElementById('location-input');
+        const resultDiv = document.getElementById('result');
+        const locationName = document.getElementById('location-name');
+        const tempC = document.getElementById('temp-c');
+        const conditionText = document.getElementById('condition-text');
+        const conditionIcon = document.getElementById('condition-icon');
+        const errorDiv = document.getElementById('error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const location = locationInput.value.trim();
+            if (!location) return;
+
+            errorDiv.textContent = '';
+            resultDiv.style.display = 'none';
+
+            try {
+                const apiKey = '2f0f869cbcb544fd949113756252109';
+                const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(location)}&aqi=yes`;
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Location not found or API error');
+                }
+                const data = await response.json();
+
+                locationName.textContent = `${data.location.name}, ${data.location.country}`;
+                tempC.textContent = data.current.temp_c;
+                conditionText.textContent = data.current.condition.text;
+                conditionIcon.src = data.current.condition.icon;
+                conditionIcon.alt = data.current.condition.text;
+
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                errorDiv.textContent = error.message;
+            }
+        });
+    </script>
+
+</body>
+
+</html>
